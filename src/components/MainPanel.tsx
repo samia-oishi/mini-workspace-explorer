@@ -8,12 +8,14 @@ interface MainPanelProps {
   selectedFolderId: string;
   onNavigate: (id: string) => void;
   onCreateFolder: () => void;
+  onCreateFile: () => void;
 }
 function MainPanel({
   items,
   selectedFolderId,
   onNavigate,
   onCreateFolder,
+  onCreateFile,
 }: MainPanelProps) {
   const selectedFolder = items.find((item) => item.id === selectedFolderId);
 
@@ -38,14 +40,25 @@ function MainPanel({
           <h2 className="text-xl font-semibold text-slate-900">
             {selectedFolder.name}
           </h2>
-          <button
-            type="button"
-            onClick={onCreateFolder}
-            className="mt-4 inline-flex items-center gap-2 rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800"
-          >
-            <Folder size={16} />
-            New Folder
-          </button>
+          <div className="mt-4 flex gap-2">
+  <button
+    type="button"
+    onClick={onCreateFolder}
+    className="inline-flex items-center gap-2 rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800"
+  >
+    <Folder size={16} />
+    New Folder
+  </button>
+
+  <button
+    type="button"
+    onClick={onCreateFile}
+    className="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+  >
+    <FilePlus size={16} />
+    New File
+  </button>
+</div>
 
           <div className="mt-6 space-y-2">
             {children.length === 0 ? (

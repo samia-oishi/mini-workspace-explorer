@@ -104,6 +104,29 @@ function App() {
 
     setItems((currentItems) => [...currentItems, newFolder]);
   };
+  const handleCreateFile = () => {
+    const name = window.prompt("Enter file name:");
+
+    if (!name) {
+      return;
+    }
+
+    const trimmedName = name.trim();
+
+    if (!trimmedName) {
+      return;
+    }
+
+    const newFile: WorkspaceItem = {
+      id: createId(),
+      name: trimmedName,
+      type: "file",
+      parentId: selectedFolderId,
+      content: "",
+    };
+
+    setItems((currentItems) => [...currentItems, newFile]);
+  };
   return (
     <div className="flex h-screen bg-slate-100 text-slate-900">
       <aside className="w-72 border-r border-slate-200 bg-white">
@@ -134,6 +157,7 @@ function App() {
         selectedFolderId={selectedFolderId}
         onNavigate={handleNavigate}
         onCreateFolder={handleCreateFolder}
+        onCreateFile={handleCreateFile}
       />
     </div>
   );
