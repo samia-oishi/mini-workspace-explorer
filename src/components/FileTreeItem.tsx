@@ -1,8 +1,14 @@
 import type { WorkspaceItem } from "../types/workspace";
 import { getChildren } from "../utils/workspace";
+import {
+  ChevronDown,
+  ChevronRight,
+  FileText,
+  Folder,
+} from "lucide-react";
 
 interface FileTreeItemProps {
-  item: WorkspaceItem;
+  item: WorkspaceItem[];
   items: WorkspaceItem[];
   level: number;
   selectedFolderId: string | null;
@@ -62,14 +68,22 @@ function FileTreeItem({
             }}
             className="flex h-5 w-5 items-center justify-center rounded text-slate-500 hover:bg-slate-200"
           >
-            {isExpanded ? "⌄" : "›"}
+            {isExpanded ? (
+              <ChevronDown size={16} />
+            ) : (
+              <ChevronRight size={16} />
+            )}
           </button>
         ) : (
           <span className="w-5" />
         )}
 
-        <span>
-          {isFolder ? "📁" : "📄"}
+        <span className="text-slate-500">
+          {isFolder ? (
+            <Folder size={18} />
+          ) : (
+            <FileText size={18} />
+          )}
         </span>
 
         <span className="truncate">

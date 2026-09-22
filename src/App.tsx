@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { WorkspaceItem } from "./types/workspace";
 import FileTree from "./components/FileTree";
+import MainPanel from "./components/MainPanel";
 
 import { loadWorkspace, saveWorkspace } from "./utils/storage";
 
@@ -49,6 +50,7 @@ function App() {
   useEffect(() => {
     saveWorkspace(items);
   }, [items]);
+  /* left panel file toggles stuff ..selected folder handling can be reused for both panels*/
   const [expandedFolderIds, setExpandedFolderIds] = useState<Set<string>>(
     new Set(["root"]),
   );
@@ -72,6 +74,12 @@ function App() {
 
       return next;
     });
+  };
+  /* main panel stuff */
+  
+  const handleNavigate = (id: string) => {
+    setSelectedFolderId(id);
+    setSelectedFileId(null);
   };
   return (
     <div className="flex h-screen bg-slate-100 text-slate-900">
@@ -98,15 +106,11 @@ function App() {
         </div>
       </aside>
 
-      <main className="flex-1 p-6">
-        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold">Workspace</h2>
-
-          <p className="mt-2 text-sm text-slate-500">
-            Select a file or folder from the explorer.
-          </p>
-        </div>
-      </main>
+      <MainPanel
+        items={items}
+        selectedFolderId={selectedFolderId}
+        onNavigate={handleNavigate}
+      />
     </div>
   );
 }
