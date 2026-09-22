@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { WorkspaceItem } from "./types/workspace";
 import FileTree from "./components/FileTree";
 import MainPanel from "./components/MainPanel";
+import { createId } from "./utils/workspace";
 
 import { loadWorkspace, saveWorkspace } from "./utils/storage";
 
@@ -76,10 +77,32 @@ function App() {
     });
   };
   /* main panel stuff */
-  
+
   const handleNavigate = (id: string) => {
     setSelectedFolderId(id);
     setSelectedFileId(null);
+  };
+  const handleCreateFolder = () => {
+    const name = window.prompt("Enter folder name:");
+
+    if (!name) {
+      return;
+    }
+
+    const trimmedName = name.trim();
+
+    if (!trimmedName) {
+      return;
+    }
+
+    const newFolder: WorkspaceItem = {
+      id: createId(),
+      name: trimmedName,
+      type: "folder",
+      parentId: selectedFolderId,
+    };
+
+    setItems((currentItems) => [...currentItems, newFolder]);
   };
   return (
     <div className="flex h-screen bg-slate-100 text-slate-900">
@@ -110,6 +133,7 @@ function App() {
         items={items}
         selectedFolderId={selectedFolderId}
         onNavigate={handleNavigate}
+        onCreateFolder={handleCreateFolder}
       />
     </div>
   );

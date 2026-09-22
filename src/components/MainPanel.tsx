@@ -1,31 +1,27 @@
 import type { WorkspaceItem } from "../types/workspace";
 import { getChildren } from "../utils/workspace";
-import { FileText, Folder } from "lucide-react";
+import { FileText, Folder, FilePlus } from "lucide-react";
 import FolderPath from "./FolderPath";
 
 interface MainPanelProps {
   items: WorkspaceItem[];
   selectedFolderId: string;
   onNavigate: (id: string) => void;
+  onCreateFolder: () => void;
 }
-
 function MainPanel({
   items,
   selectedFolderId,
   onNavigate,
+  onCreateFolder,
 }: MainPanelProps) {
-  const selectedFolder = items.find(
-    (item) => item.id === selectedFolderId,
-  );
+  const selectedFolder = items.find((item) => item.id === selectedFolderId);
 
   if (!selectedFolder) {
     return null;
   }
 
-  const children = getChildren(
-    items,
-    selectedFolderId,
-  );
+  const children = getChildren(items, selectedFolderId);
 
   return (
     <main className="flex-1 overflow-auto p-6">
@@ -42,12 +38,18 @@ function MainPanel({
           <h2 className="text-xl font-semibold text-slate-900">
             {selectedFolder.name}
           </h2>
+          <button
+            type="button"
+            onClick={onCreateFolder}
+            className="mt-4 inline-flex items-center gap-2 rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800"
+          >
+            <Folder size={16} />
+            New Folder
+          </button>
 
           <div className="mt-6 space-y-2">
             {children.length === 0 ? (
-              <p className="text-sm text-slate-500">
-                This folder is empty.
-              </p>
+              <p className="text-sm text-slate-500">This folder is empty.</p>
             ) : (
               children.map((child) => (
                 <div
