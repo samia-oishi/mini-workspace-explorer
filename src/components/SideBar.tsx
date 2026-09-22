@@ -25,19 +25,14 @@ function SideBar({
   onOpenFile,
   onToggleFolder,
 }: SideBarProps) {
-  const normalizedQuery =
-    searchQuery.trim().toLowerCase();
+  const normalizedQuery = searchQuery.trim().toLowerCase();
 
   const searchResults = normalizedQuery
-    ? items.filter((item) =>
-        item.name
-          .toLowerCase()
-          .includes(normalizedQuery),
-      )
+    ? items.filter((item) => item.name.toLowerCase().includes(normalizedQuery))
     : [];
 
   return (
-    <aside className="w-full shrink-0 border-b border-slate-200 bg-white md:w-72 md:border-b-0 md:border-r">
+    <aside className="h-full w-full shrink-0 bg-white md:w-72">
       <div className="border-b border-slate-200 px-4 py-4">
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-900 text-white shadow-sm">
@@ -49,18 +44,13 @@ function SideBar({
               Workspace Explorer
             </h1>
 
-            <p className="mt-0.5 text-xs text-slate-500">
-              Mini Workspace
-            </p>
+            <p className="mt-0.5 text-xs text-slate-500">Mini Workspace</p>
           </div>
         </div>
       </div>
 
       <div className="border-b border-slate-200 p-3">
-        <SearchBar
-          value={searchQuery}
-          onChange={onSearchChange}
-        />
+        <SearchBar value={searchQuery} onChange={onSearchChange} />
       </div>
 
       {normalizedQuery ? (
