@@ -1,9 +1,15 @@
 import { useEffect, useState } from "react";
 import type { WorkspaceItem } from "./types/workspace";
-import FileTree from "./components/FileTree";
 import MainPanel from "./components/MainPanel";
-import { createId, deleteItemAndNestedItems } from "./utils/workspace";
-import { loadWorkspace, saveWorkspace } from "./utils/storage";
+import {
+  createId,
+  deleteItemAndNestedItems,
+} from "./utils/workspace";
+import {
+  loadWorkspace,
+  saveWorkspace,
+} from "./utils/storage";
+import SideBar from "./components/SideBar";
 
 const initialWorkspace: WorkspaceItem[] = [
   {
@@ -41,27 +47,36 @@ const initialWorkspace: WorkspaceItem[] = [
 ];
 
 function App() {
+  const [searchQuery, setSearchQuery] = useState("");
+
   const [items, setItems] = useState<WorkspaceItem[]>(
     () => loadWorkspace() ?? initialWorkspace,
   );
 
-  const [selectedFolderId, setSelectedFolderId] = useState("root");
+  const [selectedFolderId, setSelectedFolderId] =
+    useState("root");
+
+  const [expandedFolderIds, setExpandedFolderIds] =
+    useState<Set<string>>(
+      new Set(["root"]),
+    );
+
+  const [selectedFileId, setSelectedFileId] =
+    useState<string | null>(null);
 
   useEffect(() => {
     saveWorkspace(items);
   }, [items]);
-  /* left panel file toggles stuff ..selected folder handling can be reused for both panels*/
-  const [expandedFolderIds, setExpandedFolderIds] = useState<Set<string>>(
-    new Set(["root"]),
-  );
-  const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
+
   const handleSelectFolder = (id: string) => {
     setSelectedFolderId(id);
     setSelectedFileId(null);
   };
+
   const handleOpenFile = (id: string) => {
     setSelectedFileId(id);
   };
+
   const handleToggleFolder = (id: string) => {
     setExpandedFolderIds((current) => {
       const next = new Set(current);
@@ -75,14 +90,16 @@ function App() {
       return next;
     });
   };
-  /* main panel stuff */
 
   const handleNavigate = (id: string) => {
     setSelectedFolderId(id);
     setSelectedFileId(null);
   };
+
   const handleCreateFolder = () => {
-    const name = window.prompt("Enter folder name:");
+    const name = window.prompt(
+      "Enter folder name:",
+    );
 
     if (!name) {
       return;
@@ -101,10 +118,16 @@ function App() {
       parentId: selectedFolderId,
     };
 
-    setItems((currentItems) => [...currentItems, newFolder]);
+    setItems((currentItems) => [
+      ...currentItems,
+      newFolder,
+    ]);
   };
+
   const handleCreateFile = () => {
-    const name = window.prompt("Enter file name:");
+    const name = window.prompt(
+      "Enter file name:",
+    );
 
     if (!name) {
       return;
@@ -124,16 +147,26 @@ function App() {
       content: "",
     };
 
-    setItems((currentItems) => [...currentItems, newFile]);
+    setItems((currentItems) => [
+      ...currentItems,
+      newFile,
+    ]);
   };
+
   const handleRenameItem = (itemId: string) => {
-    const item = items.find((currentItem) => currentItem.id === itemId);
+    const item = items.find(
+      (currentItem) =>
+        currentItem.id === itemId,
+    );
 
     if (!item) {
       return;
     }
 
-    const name = window.prompt("Enter new name:", item.name);
+    const name = window.prompt(
+      "Enter new name:",
+      item.name,
+    );
 
     if (!name) {
       return;
@@ -156,30 +189,47 @@ function App() {
       ),
     );
   };
+
   const handleDeleteItem = (itemId: string) => {
-    const item = items.find((currentItem) => currentItem.id === itemId);
+    const item = items.find(
+      (currentItem) =>
+        currentItem.id === itemId,
+    );
 
     if (!item) {
       return;
     }
 
-    const confirmed = window.confirm(`Delete "${item.name}"?`);
+    const confirmed = window.confirm(
+      `Delete "${item.name}"?`,
+    );
 
     if (!confirmed) {
       return;
     }
 
-    setItems((currentItems) => deleteItemAndNestedItems(currentItems, itemId));
+    setItems((currentItems) =>
+      deleteItemAndNestedItems(
+        currentItems,
+        itemId,
+      ),
+    );
 
     if (selectedFolderId === itemId) {
-      setSelectedFolderId(item.parentId ?? "root");
+      setSelectedFolderId(
+        item.parentId ?? "root",
+      );
     }
 
     if (selectedFileId === itemId) {
       setSelectedFileId(null);
     }
   };
-  const handleSaveFile = (fileId: string, content: string) => {
+
+  const handleSaveFile = (
+    fileId: string,
+    content: string,
+  ) => {
     setItems((currentItems) =>
       currentItems.map((item) =>
         item.id === fileId
@@ -191,30 +241,19 @@ function App() {
       ),
     );
   };
+
   return (
     <div className="flex h-screen bg-slate-100 text-slate-900">
-      <aside className="w-72 border-r border-slate-200 bg-white">
-        <div className="border-b border-slate-200 px-4 py-4">
-          <h1 className="text-lg font-semibold">Workspace Explorer</h1>
-
-          <p className="mt-1 text-sm text-slate-500">Mini Workspace</p>
-        </div>
-
-        <div className="p-3">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
-            Explorer
-          </p>
-
-          <FileTree
-            items={items}
-            selectedFolderId={selectedFolderId}
-            expandedFolderIds={expandedFolderIds}
-            onSelectFolder={handleSelectFolder}
-            onOpenFile={handleOpenFile}
-            onToggleFolder={handleToggleFolder}
-          />
-        </div>
-      </aside>
+      <SideBar
+        items={items}
+        selectedFolderId={selectedFolderId}
+        expandedFolderIds={expandedFolderIds}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        onSelectFolder={handleSelectFolder}
+        onOpenFile={handleOpenFile}
+        onToggleFolder={handleToggleFolder}
+      />
 
       <MainPanel
         items={items}
