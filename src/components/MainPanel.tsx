@@ -1,12 +1,6 @@
 import type { WorkspaceItem } from "../types/workspace";
 import { getChildren } from "../utils/workspace";
-import {
-  FileText,
-  Folder,
-  FilePlus,
-  Pencil,
-  Trash2,
-} from "lucide-react";
+import { FileText, Folder, FilePlus, Pencil, Trash2 } from "lucide-react";
 import FolderPath from "./FolderPath";
 import FileEditor from "./FileEditor";
 
@@ -20,6 +14,7 @@ interface MainPanelProps {
   onRenameItem: (itemId: string) => void;
   onDeleteItem: (itemId: string) => void;
   onOpenFile: (id: string) => void;
+  onSaveFile: (fileId: string, content: string) => void;
 }
 
 function MainPanel({
@@ -32,10 +27,9 @@ function MainPanel({
   onRenameItem,
   onDeleteItem,
   onOpenFile,
+  onSaveFile,
 }: MainPanelProps) {
-  const selectedFolder = items.find(
-    (item) => item.id === selectedFolderId,
-  );
+  const selectedFolder = items.find((item) => item.id === selectedFolderId);
 
   const selectedFile = selectedFileId
     ? items.find((item) => item.id === selectedFileId)
@@ -49,16 +43,17 @@ function MainPanel({
     return (
       <main className="flex-1 overflow-auto p-6">
         <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
-          <FileEditor file={selectedFile} />
+          <FileEditor
+            key={selectedFile.id}
+            file={selectedFile}
+            onSave={onSaveFile}
+          />
         </div>
       </main>
     );
   }
 
-  const children = getChildren(
-    items,
-    selectedFolderId,
-  );
+  const children = getChildren(items, selectedFolderId);
 
   return (
     <main className="flex-1 overflow-auto p-6">
@@ -98,9 +93,7 @@ function MainPanel({
 
           <div className="mt-6 space-y-2">
             {children.length === 0 ? (
-              <p className="text-sm text-slate-500">
-                This folder is empty.
-              </p>
+              <p className="text-sm text-slate-500">This folder is empty.</p>
             ) : (
               children.map((child) => (
                 <div

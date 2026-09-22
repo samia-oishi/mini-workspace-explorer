@@ -179,6 +179,18 @@ function App() {
       setSelectedFileId(null);
     }
   };
+  const handleSaveFile = (fileId: string, content: string) => {
+    setItems((currentItems) =>
+      currentItems.map((item) =>
+        item.id === fileId
+          ? {
+              ...item,
+              content,
+            }
+          : item,
+      ),
+    );
+  };
   return (
     <div className="flex h-screen bg-slate-100 text-slate-900">
       <aside className="w-72 border-r border-slate-200 bg-white">
@@ -205,16 +217,17 @@ function App() {
       </aside>
 
       <MainPanel
-  items={items}
-  selectedFolderId={selectedFolderId}
-  selectedFileId={selectedFileId}
-  onNavigate={handleNavigate}
-  onCreateFolder={handleCreateFolder}
-  onCreateFile={handleCreateFile}
-  onRenameItem={handleRenameItem}
-  onDeleteItem={handleDeleteItem}
-  onOpenFile={handleOpenFile}
-/>
+        items={items}
+        selectedFolderId={selectedFolderId}
+        selectedFileId={selectedFileId}
+        onNavigate={handleNavigate}
+        onCreateFolder={handleCreateFolder}
+        onCreateFile={handleCreateFile}
+        onRenameItem={handleRenameItem}
+        onDeleteItem={handleDeleteItem}
+        onOpenFile={handleOpenFile}
+        onSaveFile={handleSaveFile}
+      />
     </div>
   );
 }
