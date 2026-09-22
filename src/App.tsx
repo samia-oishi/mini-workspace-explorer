@@ -3,6 +3,10 @@ import type { WorkspaceItem } from "./types/workspace";
 import MainPanel from "./components/MainPanel";
 import SideBar from "./components/SideBar";
 import {
+  Menu,
+  X,
+} from "lucide-react";
+import {
   createId,
   deleteItemAndNestedItems,
 } from "./utils/workspace";
@@ -48,6 +52,8 @@ const initialWorkspace: WorkspaceItem[] = [
 
 function App() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isSidebarOpen, setIsSidebarOpen] =
+  useState(false);
 
   const [items, setItems] = useState<WorkspaceItem[]>(
   () => {
@@ -94,28 +100,30 @@ function App() {
     );
   };
 
-  const handleSelectFolder = (id: string) => {
-    if (!canLeaveFile()) {
-      return;
-    }
+const handleSelectFolder = (id: string) => {
+  if (!canLeaveFile()) {
+    return;
+  }
 
-    setSelectedFolderId(id);
-    setSelectedFileId(null);
-    setHasUnsavedChanges(false);
-  };
+  setSelectedFolderId(id);
+  setSelectedFileId(null);
+  setHasUnsavedChanges(false);
+  setIsSidebarOpen(false);
+};
 
-  const handleOpenFile = (id: string) => {
-    if (selectedFileId === id) {
-      return;
-    }
+const handleOpenFile = (id: string) => {
+  if (selectedFileId === id) {
+    return;
+  }
 
-    if (!canLeaveFile()) {
-      return;
-    }
+  if (!canLeaveFile()) {
+    return;
+  }
 
-    setSelectedFileId(id);
-    setHasUnsavedChanges(false);
-  };
+  setSelectedFileId(id);
+  setHasUnsavedChanges(false);
+  setIsSidebarOpen(false);
+};
 
   const handleToggleFolder = (id: string) => {
     setExpandedFolderIds((current) => {
@@ -340,19 +348,66 @@ function App() {
     setHasUnsavedChanges(false);
   };
 
-  return (
-    <div className="flex min-h-screen flex-col bg-slate-100 text-slate-900 md:flex-row">
-      <SideBar
-        items={items}
-        selectedFolderId={selectedFolderId}
-        expandedFolderIds={expandedFolderIds}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        onSelectFolder={handleSelectFolder}
-        onOpenFile={handleOpenFile}
-        onToggleFolder={handleToggleFolder}
-      />
+return (
+  <div className="min-h-screen bg-slate-100 text-slate-900">
+    {/* Mobile Header */}
+    <div className="flex items-center gap-3 border-b border-slate-200 bg-white px-4 py-3 md:hidden">
+      <button
+        type="button"
+        onClick={() => setIsSidebarOpen(true)}
+        className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100"
+        aria-label="Open sidebar"
+      >
+        <Menu size={22} />
+      </button>
 
+      <div className="min-w-0">
+        <h1 className="truncate text-sm font-semibold text-slate-900">
+          Workspace Explorer
+        </h1>
+      </div>
+    </div>
+
+    {/* Mobile Overlay */}
+    {isSidebarOpen && (
+      <div
+        className="fixed inset-0 z-40 bg-slate-900/40 md:hidden"
+        onClick={() => setIsSidebarOpen(false)}
+      />
+    )}
+
+    {/* Sidebar */}
+    <div
+      className={`fixed inset-y-0 left-0 z-50 w-72 transform bg-white transition-transform duration-200 md:static md:z-auto md:block md:w-72 md:translate-x-0 ${
+        isSidebarOpen
+          ? "translate-x-0"
+          : "-translate-x-full"
+      }`}
+    >
+      <div className="relative h-full">
+        <button
+          type="button"
+          onClick={() => setIsSidebarOpen(false)}
+          className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-md text-slate-500 hover:bg-slate-100 md:hidden"
+          aria-label="Close sidebar"
+        >
+          <X size={20} />
+        </button>
+
+        <SideBar
+          items={items}
+          selectedFolderId={selectedFolderId}
+          expandedFolderIds={expandedFolderIds}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          onSelectFolder={handleSelectFolder}
+          onOpenFile={handleOpenFile}
+          onToggleFolder={handleToggleFolder}
+        />
+      </div>
+    </div>
+
+    <div className="min-w-0 md:flex">
       <MainPanel
         items={items}
         selectedFolderId={selectedFolderId}
@@ -367,7 +422,8 @@ function App() {
         onUnsavedChange={setHasUnsavedChanges}
       />
     </div>
-  );
+  </div>
+);
 }
 
 export default App;
