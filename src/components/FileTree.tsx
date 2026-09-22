@@ -19,7 +19,7 @@ function FileTree({
   onToggleFolder,
 }: FileTreeProps) {
   const rootFolder = items.find(
-    (item) => item.id === "root"
+    (item) => item.id === "root",
   );
 
   if (!rootFolder) {
@@ -27,7 +27,7 @@ function FileTree({
   }
 
   return (
-    <div className="space-y-1">
+    <div className="min-w-0 space-y-1 overflow-hidden">
       <FileTreeItem
         item={rootFolder}
         items={items}

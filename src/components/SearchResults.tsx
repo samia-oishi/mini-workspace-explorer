@@ -33,9 +33,15 @@ function SearchResults({
               onOpenFile(item.id);
             }
           }}
-          className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm text-slate-700 hover:bg-slate-100"
+          className="flex w-full min-w-0 items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-slate-700 transition hover:bg-slate-100"
         >
-          <span className="shrink-0 text-slate-500">
+          <span
+            className={`shrink-0 ${
+              item.type === "folder"
+                ? "text-amber-600"
+                : "text-blue-400"
+            }`}
+          >
             {item.type === "folder" ? (
               <Folder size={17} />
             ) : (
@@ -43,7 +49,7 @@ function SearchResults({
             )}
           </span>
 
-          <span className="truncate">
+          <span className="min-w-0 truncate">
             {item.name}
           </span>
         </button>

@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 
 interface FileTreeItemProps {
-  item: WorkspaceItem[];
+  item: WorkspaceItem;
   items: WorkspaceItem[];
   level: number;
   selectedFolderId: string | null;
@@ -30,9 +30,12 @@ function FileTreeItem({
 }: FileTreeItemProps) {
   const isFolder = item.type === "folder";
 
-  const isExpanded = expandedFolderIds.has(item.id);
+  const isExpanded = expandedFolderIds.has(
+    item.id,
+  );
 
-  const isSelected = selectedFolderId === item.id;
+  const isSelected =
+    selectedFolderId === item.id;
 
   const children = isFolder
     ? getChildren(items, item.id)
@@ -47,10 +50,10 @@ function FileTreeItem({
   };
 
   return (
-    <div>
+    <div className="min-w-0">
       <div
         onClick={handleClick}
-        className={`flex cursor-pointer items-center gap-2 rounded-md py-1.5 text-sm transition hover:bg-slate-100 ${
+        className={`flex min-w-0 cursor-pointer items-center gap-2 rounded-md py-1.5 pr-2 text-sm transition hover:bg-slate-100 ${
           isSelected
             ? "bg-slate-100 font-medium text-slate-900"
             : "text-slate-700"
@@ -66,7 +69,7 @@ function FileTreeItem({
               event.stopPropagation();
               onToggleFolder(item.id);
             }}
-            className="flex h-5 w-5 items-center justify-center rounded text-slate-500 hover:bg-slate-200"
+            className="flex h-5 w-5 shrink-0 items-center justify-center rounded text-slate-500 hover:bg-slate-200"
           >
             {isExpanded ? (
               <ChevronDown size={16} />
@@ -75,10 +78,16 @@ function FileTreeItem({
             )}
           </button>
         ) : (
-          <span className="w-5" />
+          <span className="w-5 shrink-0" />
         )}
 
-        <span className="text-slate-500">
+        <span
+          className={
+            isFolder
+              ? "shrink-0 text-amber-600"
+              : "shrink-0 text-blue-400"
+          }
+        >
           {isFolder ? (
             <Folder size={18} />
           ) : (
@@ -86,7 +95,7 @@ function FileTreeItem({
           )}
         </span>
 
-        <span className="truncate">
+        <span className="min-w-0 truncate">
           {item.name}
         </span>
       </div>

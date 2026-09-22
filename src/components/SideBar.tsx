@@ -2,6 +2,7 @@ import type { WorkspaceItem } from "../types/workspace";
 import FileTree from "./FileTree";
 import SearchBar from "./SearchBar";
 import SearchResults from "./SearchResults";
+import { Layers3 } from "lucide-react";
 
 interface SideBarProps {
   items: WorkspaceItem[];
@@ -24,7 +25,8 @@ function SideBar({
   onOpenFile,
   onToggleFolder,
 }: SideBarProps) {
-  const normalizedQuery = searchQuery.trim().toLowerCase();
+  const normalizedQuery =
+    searchQuery.trim().toLowerCase();
 
   const searchResults = normalizedQuery
     ? items.filter((item) =>
@@ -35,15 +37,23 @@ function SideBar({
     : [];
 
   return (
-    <aside className="w-72 border-r border-slate-200 bg-white">
+    <aside className="w-full shrink-0 border-b border-slate-200 bg-white md:w-72 md:border-b-0 md:border-r">
       <div className="border-b border-slate-200 px-4 py-4">
-        <h1 className="text-lg font-semibold">
-          Workspace Explorer
-        </h1>
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-900 text-white shadow-sm">
+            <Layers3 size={20} />
+          </div>
 
-        <p className="mt-1 text-sm text-slate-500">
-          Mini Workspace
-        </p>
+          <div className="min-w-0">
+            <h1 className="truncate text-sm font-semibold tracking-tight text-slate-900">
+              Workspace Explorer
+            </h1>
+
+            <p className="mt-0.5 text-xs text-slate-500">
+              Mini Workspace
+            </p>
+          </div>
+        </div>
       </div>
 
       <div className="border-b border-slate-200 p-3">
@@ -67,8 +77,8 @@ function SideBar({
         </div>
       ) : (
         <div className="p-3">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
-            Explorer
+          <p className="mb-2 px-1 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+            Files
           </p>
 
           <FileTree

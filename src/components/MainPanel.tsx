@@ -1,6 +1,12 @@
 import type { WorkspaceItem } from "../types/workspace";
 import { getChildren } from "../utils/workspace";
-import { FileText, Folder, FilePlus, Pencil, Trash2 } from "lucide-react";
+import {
+  FileText,
+  Folder,
+  FilePlus,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 import FolderPath from "./FolderPath";
 import FileEditor from "./FileEditor";
 
@@ -15,6 +21,7 @@ interface MainPanelProps {
   onDeleteItem: (itemId: string) => void;
   onOpenFile: (id: string) => void;
   onSaveFile: (fileId: string, content: string) => void;
+  onUnsavedChange: (hasUnsavedChanges: boolean) => void;
 }
 
 function MainPanel({
@@ -28,11 +35,16 @@ function MainPanel({
   onDeleteItem,
   onOpenFile,
   onSaveFile,
+  onUnsavedChange,
 }: MainPanelProps) {
-  const selectedFolder = items.find((item) => item.id === selectedFolderId);
+  const selectedFolder = items.find(
+    (item) => item.id === selectedFolderId,
+  );
 
   const selectedFile = selectedFileId
-    ? items.find((item) => item.id === selectedFileId)
+    ? items.find(
+        (item) => item.id === selectedFileId,
+      )
     : null;
 
   if (!selectedFolder) {
@@ -41,24 +53,32 @@ function MainPanel({
 
   if (selectedFile) {
     return (
-      <main className="flex-1 overflow-auto p-6">
-        <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
+      <main className="min-w-0 flex-1 overflow-auto p-4 md:p-6">
+        <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
           <FileEditor
             key={selectedFile.id}
             file={selectedFile}
             onSave={onSaveFile}
+            onUnsavedChange={onUnsavedChange}
+            onDeleteItem={onDeleteItem}
           />
         </div>
       </main>
     );
   }
 
-  const children = getChildren(items, selectedFolderId);
+  const children = getChildren(
+    items,
+    selectedFolderId,
+  );
+
+  const isRootFolder =
+    selectedFolder.id === "root";
 
   return (
-    <main className="flex-1 overflow-auto p-6">
-      <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
-        <div className="border-b border-slate-200 px-6 py-4">
+    <main className="min-w-0 flex-1 overflow-auto p-4 md:p-6">
+      <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
+        <div className="border-b border-slate-200 px-4 py-4 md:px-6">
           <FolderPath
             items={items}
             folderId={selectedFolderId}
@@ -66,36 +86,97 @@ function MainPanel({
           />
         </div>
 
-        <div className="p-6">
-          <h2 className="text-xl font-semibold text-slate-900">
-            {selectedFolder.name}
-          </h2>
+        <div className="p-4 md:p-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0">
+              <div className="flex min-w-0 items-center gap-2">
+                <Folder
+                  size={22}
+                  className="shrink-0 text-amber-600"
+                />
 
-          <div className="mt-4 flex gap-2">
-            <button
-              type="button"
-              onClick={onCreateFolder}
-              className="inline-flex items-center gap-2 rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800"
-            >
-              <Folder size={16} />
-              New Folder
-            </button>
+                <h2 className="truncate text-2xl font-semibold tracking-tight text-slate-900">
+                  {selectedFolder.name}
+                </h2>
+              </div>
 
-            <button
-              type="button"
-              onClick={onCreateFile}
-              className="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-            >
-              <FilePlus size={16} />
-              New File
-            </button>
+              <p className="mt-1 text-sm text-slate-500">
+                {children.length}{" "}
+                {children.length === 1
+                  ? "item"
+                  : "items"}
+              </p>
+            </div>
+
+            <div className="flex shrink-0 flex-wrap gap-2">
+              {!isRootFolder && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      onRenameItem(
+                        selectedFolder.id,
+                      )
+                    }
+                    className="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                  >
+                    <Pencil size={16} />
+                    Rename
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      onDeleteItem(
+                        selectedFolder.id,
+                      )
+                    }
+                    className="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+                  >
+                    <Trash2 size={16} />
+                    Delete
+                  </button>
+                </>
+              )}
+
+              <button
+                type="button"
+                onClick={onCreateFolder}
+                className="inline-flex items-center gap-2 rounded-md bg-blue-900/90 px-3 py-2 text-sm font-medium text-white hover:bg-blue-900"
+              >
+                <Folder size={16} />
+                New Folder
+              </button>
+
+              <button
+                type="button"
+                onClick={onCreateFile}
+                className="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-900 hover:bg-slate-50"
+              >
+                <FilePlus size={16} />
+                New File
+              </button>
+            </div>
           </div>
 
-          <div className="mt-6 space-y-2">
-            {children.length === 0 ? (
-              <p className="text-sm text-slate-500">This folder is empty.</p>
-            ) : (
-              children.map((child) => (
+          {children.length === 0 ? (
+            <div className="mt-8 flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 px-6 py-12 text-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 text-amber-500">
+                <Folder size={24} />
+              </div>
+
+              <h3 className="mt-4 text-sm font-semibold text-slate-900">
+                This folder is empty
+              </h3>
+
+              <p className="mt-1 max-w-sm text-sm text-slate-500">
+                Create a folder or text file to
+                get started.
+              </p>
+            </div>
+          ) : (
+            <div className="mt-6 space-y-2">
+              {children.map((child) => (
                 <div
                   key={child.id}
                   onClick={() => {
@@ -105,10 +186,16 @@ function MainPanel({
                       onOpenFile(child.id);
                     }
                   }}
-                  className="flex cursor-pointer items-center justify-between rounded-lg border border-slate-200 px-4 py-3 hover:bg-slate-50"
+                  className="flex cursor-pointer items-center justify-between gap-3 rounded-lg border border-slate-200 px-3 py-3 hover:bg-slate-50 md:px-4"
                 >
                   <div className="flex min-w-0 items-center gap-3">
-                    <span className="text-slate-500">
+                    <span
+                      className={
+                        child.type === "folder"
+                          ? "shrink-0 text-amber-600"
+                          : "shrink-0 text-blue-400"
+                      }
+                    >
                       {child.type === "folder" ? (
                         <Folder size={18} />
                       ) : (
@@ -147,9 +234,9 @@ function MainPanel({
                     </button>
                   </div>
                 </div>
-              ))
-            )}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </main>

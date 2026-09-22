@@ -10,18 +10,24 @@ export function loadWorkspace(): WorkspaceItem[] | null {
       return null;
     }
 
-    return JSON.parse(stored) as WorkspaceItem[];
+    const parsed = JSON.parse(stored);
+
+    if (!Array.isArray(parsed)) {
+      return null;
+    }
+
+    return parsed as WorkspaceItem[];
   } catch {
     return null;
   }
 }
 
 export function saveWorkspace(
-  items: WorkspaceItem[]
+  items: WorkspaceItem[],
 ): void {
   localStorage.setItem(
     STORAGE_KEY,
-    JSON.stringify(items)
+    JSON.stringify(items),
   );
 }
 
