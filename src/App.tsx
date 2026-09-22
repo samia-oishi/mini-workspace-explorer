@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import type { WorkspaceItem } from "./types/workspace";
 import FileTree from "./components/FileTree";
 import MainPanel from "./components/MainPanel";
-import { createId } from "./utils/workspace";
-
+import { createId, deleteItemAndNestedItems } from "./utils/workspace";
 import { loadWorkspace, saveWorkspace } from "./utils/storage";
 
 const initialWorkspace: WorkspaceItem[] = [
@@ -127,6 +126,59 @@ function App() {
 
     setItems((currentItems) => [...currentItems, newFile]);
   };
+  const handleRenameItem = (itemId: string) => {
+    const item = items.find((currentItem) => currentItem.id === itemId);
+
+    if (!item) {
+      return;
+    }
+
+    const name = window.prompt("Enter new name:", item.name);
+
+    if (!name) {
+      return;
+    }
+
+    const trimmedName = name.trim();
+
+    if (!trimmedName) {
+      return;
+    }
+
+    setItems((currentItems) =>
+      currentItems.map((currentItem) =>
+        currentItem.id === itemId
+          ? {
+              ...currentItem,
+              name: trimmedName,
+            }
+          : currentItem,
+      ),
+    );
+  };
+  const handleDeleteItem = (itemId: string) => {
+    const item = items.find((currentItem) => currentItem.id === itemId);
+
+    if (!item) {
+      return;
+    }
+
+    const confirmed = window.confirm(`Delete "${item.name}"?`);
+
+    if (!confirmed) {
+      return;
+    }
+
+    setItems((currentItems) => deleteItemAndNestedItems(currentItems, itemId));
+
+    if (selectedFolderId === itemId) {
+      setSelectedFolderId(item.parentId ?? "root");
+    }
+
+    if (selectedFileId === itemId) {
+      setSelectedFileId(null);
+    }
+  };
   return (
     <div className="flex h-screen bg-slate-100 text-slate-900">
       <aside className="w-72 border-r border-slate-200 bg-white">
@@ -153,12 +205,16 @@ function App() {
       </aside>
 
       <MainPanel
-        items={items}
-        selectedFolderId={selectedFolderId}
-        onNavigate={handleNavigate}
-        onCreateFolder={handleCreateFolder}
-        onCreateFile={handleCreateFile}
-      />
+  items={items}
+  selectedFolderId={selectedFolderId}
+  selectedFileId={selectedFileId}
+  onNavigate={handleNavigate}
+  onCreateFolder={handleCreateFolder}
+  onCreateFile={handleCreateFile}
+  onRenameItem={handleRenameItem}
+  onDeleteItem={handleDeleteItem}
+  onOpenFile={handleOpenFile}
+/>
     </div>
   );
 }
